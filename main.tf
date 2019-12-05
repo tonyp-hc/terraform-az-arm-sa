@@ -1,11 +1,11 @@
 resource "azurerm_resource_group" "example" {
-  name     = "acctestRG-01"
+  name     = "${var.prefix}-rg-arm-demo"
   location = "West US"
 }
 
 resource "azurerm_template_deployment" "example" {
-  name                = "acctesttemplate-01"
-  resource_group_name = "${azurerm_resource_group.example.name}"
+  name                = "${var.prefix}-arm-testtemplate-01"
+  resource_group_name = azurerm_resource_group.example.name
 
   template_body = <<DEPLOY
 {
@@ -65,6 +65,7 @@ resource "azurerm_template_deployment" "example" {
 }
 DEPLOY
 
+
   # these key-value pairs are passed into the ARM Template's `parameters` block
   parameters = {
     "storageAccountType" = "Standard_GRS"
@@ -74,6 +75,9 @@ DEPLOY
 }
 
 output "storageAccountName" {
-  value = "${lookup(azurerm_template_deployment.example.outputs, "storageAccountName")}"
+  value = azurerm_template_deployment.example.outputs["storageAccountName"]
 }
 
+variable "prefix" {
+  default = "ttp"
+}
